@@ -196,7 +196,7 @@ VALUES ('Ali', 'ali@example.com');
 ########################################################## FIREBASE
 ### Héberger ton projet sur Firebase
 
-## Créer un projet Firebase
+## Créer un projet Firebase``
 # Va sur console.firebase.google.com
 # Clique sur "Ajouter un projet"
 # Donne un nom à ton projet (ex: BousrahElec)

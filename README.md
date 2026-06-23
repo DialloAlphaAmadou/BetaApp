@@ -1,37 +1,99 @@
-# first_app
+# BetaApp
 
-A new Flutter project.
+Application mobile et desktop développée avec Flutter.
 
-## Getting Started
+## Description
 
-This project is a starting point for a Flutter application.
+BetaApp est une application multiplateforme développée avec Flutter permettant aux utilisateurs d'accéder aux services de l'application à travers une interface moderne et intuitive.
 
-A few resources to get you started if this is your first Flutter project:
+L'application communique avec une API REST sécurisée pour l'authentification, la gestion des données et les opérations métier.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Fonctionnalités
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Authentification utilisateur
+- Gestion des sessions
+- Consommation d'API REST
+- Gestion des tokens JWT
+- Rafraîchissement automatique des Access Tokens
+- Interface responsive
+- Compatible Android, iOS, Windows, macOS et Linux
 
-StatelessWidget: -> sert à construire une interface qui ne change pas toute seule.
+## Technologies
 
-StatefulWidget: -> est un widget qui peut changer dans le temps.
+### Frontend
 
-Text(
-  'Important',
-  style: TextStyle(
-    color: Colors.deepPurple,
-    fontSize: 24,
-    fontWeight: FontWeight.bold,
-  ),
-)
+- Flutter
+- Dart
 
-Column: -> plusieurs enfants
+### Backend
 
-children: [] -> liste de widgets
+- API REST
 
-child: -> un seul widget
+## Architecture
 
-Plusieurs widgets → Column / Row
+```text
+Flutter App
+     │
+     │ HTTPS
+     ▼
+REST API
+     │
+     ▼
+Database
+```
+
+## Gestion de l'authentification
+
+- Connexion avec email et mot de passe
+- Access Token JWT
+- Refresh Token sécurisé
+- Renouvellement automatique du token expiré
+- Déconnexion automatique si le Refresh Token est invalide
+
+## Installation
+
+### Prérequis
+
+- Flutter SDK
+- Android Studio ou VS Code
+
+### Cloner le projet
+
+```bash
+git clone https://github.com/DialloAlphaAmadou/BetaApp.git
+cd BetaApp
+```
+
+### Installer les dépendances
+
+```bash
+flutter pub get
+```
+
+### Lancer l'application
+
+```bash
+flutter run
+```
+
+## Configuration
+
+Créer un fichier de configuration :
+
+```env
+API_URL=http://localhost:5000/api
+```
+
+## Plateformes supportées
+
+- Android
+- iOS
+- Windows
+- macOS
+- Linux
+
+## Auteur
+
+Alpha Amadou Diallo
+
+Application Flutter consommant une API REST sécurisée.
