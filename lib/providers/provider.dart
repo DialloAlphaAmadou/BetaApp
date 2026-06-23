@@ -1,7 +1,6 @@
 import 'package:first_app/data/api/api_client.dart';
 import 'package:first_app/data/local/auth_storage.dart';
 import 'package:first_app/providers/auth_provider.dart';
-import 'package:first_app/repositories/auth_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final authStorageProvider = Provider<AuthStorage>((ref) {
@@ -17,12 +16,5 @@ final apiClientProvider = Provider<ApiClient>((ref) {
     } );
 });
 
-final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  final api = ref.read(apiClientProvider);
-  final storage = ref.read(authStorageProvider);
-  return AuthRepository(api, storage);
-});
-
 final userScopeProvider = StateProvider<int>((ref) => 0);
-
 

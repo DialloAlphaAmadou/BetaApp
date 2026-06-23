@@ -1,10 +1,7 @@
 import 'package:first_app/configs/Exception_config.dart';
 import 'package:first_app/controllers/Auth_controller.dart';
-import 'package:first_app/navigations/app_router.dart';
-import 'package:first_app/navigations/nav_controller.dart';
 import 'package:first_app/providers/auth_provider.dart';
-import 'package:first_app/screens/auths/config.dart';
-import 'package:first_app/screens/auths/confirm_account.dart';
+import 'package:first_app/providers/provider.dart';
 import 'package:first_app/widgets/button_widget.dart';
 import 'package:first_app/widgets/form_widget.dart';
 import 'package:first_app/widgets/tools_widget.dart';
@@ -13,19 +10,32 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 
-class RegisterPage extends ConsumerStatefulWidget {
-  const RegisterPage({super.key});
+class ChangePasswordPage extends ConsumerStatefulWidget {
+  const ChangePasswordPage({super.key});
 
   @override
-  ConsumerState<RegisterPage> createState() => _RegisterPageState();
+  ConsumerState<ChangePasswordPage> createState() => _ChangePasswordPage();
 }
 
-class _RegisterPageState extends ConsumerState<RegisterPage> {
+class _ChangePasswordPage extends ConsumerState<ChangePasswordPage> {
   final _formKey = GlobalKey<FormState>();
   final controllers = AuthFormControllers();
 
   bool isLoading = false;
   String? errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    final token = await ref.read(authStorageProvider).getRefreshToken();
+    if (!mounted) return;
+    if(token == null)  await ref.read(authProvider.notifier).logout();
+    controllers.refreshToken.text = token!;
+  }
 
   @override
   void dispose() {
@@ -42,15 +52,12 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     });
 
     try{
-
       final repo = ref.read(authRepositoryProvider);
-      await repo.registerAsync(controllers.toRegisterRequest());
+      await repo.changePasswordAsync(controllers.toChangePasswordRequest());
       if(!mounted) return;
-      await ToolsWidget.showInfoDialog(context, "Inscription réussie, un code de confirmation a ete envoyer a votre email",);
+      await ToolsWidget.showInfoDialog(context, "Modification réussie, ",);
       if(!mounted) return;
-      context.push(AppRoutes.confirmAccount, extra: controllers.email.text);
-      controllers.clear();
-      //await NavHelper.navPage(context, ConfirmAccountPage(email: controllers.email.text));
+      context.pop();
 
     }catch (e) {
       if (!mounted) return;
@@ -67,7 +74,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Register"),
+        title: const Text("Modification du mot de passe"),
       ),
       body: Scrollbar(
       controller: _scrollController,
@@ -90,10 +97,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   //Icon
-                  const Icon( Icons.person_add_alt_1, size: 80, ),
+                  const Icon( Icons.lock_reset, size: 80, ),
                   const SizedBox(height: 20),
 
-                  const Text( "Enregistrement",
+                  const Text( "Modification",
                     style: TextStyle( fontSize: 30, fontWeight: FontWeight.bold, ),
                   ),
                   const SizedBox(height: 10),
@@ -102,34 +109,23 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   FormWidget.error(errorMessage),
                   const SizedBox(height: 10),
 
-                  FormWidget.textField(label: "NOM", controller: controllers.lastName, icon: Icons.person_outline, onChanged: (_) => setState(() => errorMessage = null)),
-                  const SizedBox(height: 10),
-                  //Username
-                  FormWidget.textField(label: "PRENOM", controller: controllers.firstName, icon: Icons.badge, onChanged: (_) => setState(() => errorMessage = null)),
-                  const SizedBox(height: 10),
-                  //Username
-                  FormWidget.textField(label: "Username", controller: controllers.userName, icon: Icons.alternate_email, onChanged: (_) => setState(() => errorMessage = null)),
-                  const SizedBox(height: 10),
-                  //Username
-                  FormWidget.emailField(label: "EMAIL", controller: controllers.email, icon: Icons.email_outlined, onChanged: (_) => setState(() => errorMessage = null)),
-                  const SizedBox(height: 10),
-                  //Username
-                  FormWidget.phoneField(label: "PHONE", controller: controllers.phoneNumber, requiredField: false, icon: Icons.phone_outlined, onChanged: (_) => setState(() => errorMessage = null)),
+                  //Password
+                  FormWidget.passwordField(label: "Mot de passe actuel", controller: controllers.password, icon: Icons.lock, onChanged: (_) => setState(() => errorMessage = null)),
                   const SizedBox(height: 10),
 
-                  //Password
-                  FormWidget.passwordField(label: "Mot de passe", controller: controllers.password, icon: Icons.lock, onChanged: (_) => setState(() => errorMessage = null)),
+                  //NewPassword
+                  FormWidget.passwordField(label: "Nouveau mot de passe", controller: controllers.newPassword, icon: Icons.lock, onChanged: (_) => setState(() => errorMessage = null)),
                   const SizedBox(height: 10),
                   FormWidget.passwordField(
-                    label: "Confirmer le mot de passe", 
+                    label: "Confirmer le nouveau mot de passe", 
                     controller: controllers.confirmPassword, 
-                    confirmPsw: controllers.password.text, 
+                    confirmPsw: controllers.newPassword.text, 
                     icon: Icons.lock, 
                     onChanged: (_) => setState(() => errorMessage = null)
                   ),
                   const SizedBox(height: 10),
 
-                  ButtonWidget.button( text: "S'inscrire", isLoading: isLoading, onPressed: register, icon: Icons.app_registration),
+                  ButtonWidget.button( text: "Modifier le mot de passe", isLoading: isLoading, onPressed: register, icon: Icons.lock_reset),
                   
 
                   

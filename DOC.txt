@@ -54,6 +54,7 @@ git branch -M main
 $git push -u origin main
 
 ### pour envoyer de nouvelles modifications
+$git remote -v
 $git add .
 $git commit -m "V-0.0.1"
 $git push

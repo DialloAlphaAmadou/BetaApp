@@ -1,6 +1,13 @@
 import 'package:first_app/dto/auth_dto.dart';
 import 'package:first_app/providers/provider.dart';
+import 'package:first_app/repositories/auth_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  final api = ref.read(apiClientProvider);
+  final storage = ref.read(authStorageProvider);
+  return AuthRepository(api, storage);
+});
 
 enum AuthStatus {
   loading,
@@ -71,15 +78,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> logout() async {
     final repo = ref.read(authRepositoryProvider);
-
     await repo.logoutAsync();
     state = const AuthState.unauthenticated();
-
-    //Reset ALL user data d'un coup
     ref.read(userScopeProvider.notifier).state++;
   }
 }
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) => AuthNotifier(ref));
-
-

@@ -27,27 +27,37 @@ class AuthRepository implements IAuthRepository{
   //Deconnexion
   @override
   Future<void> logoutAsync() async {
-    final refreshToken = await token.getRefreshToken();
-    if (refreshToken != null) await client.post('/auth/logout', data:  {'RefreshToken': refreshToken});
-    await token.clearSessionAsync();
+    try {
+      final refreshToken = await token.getRefreshToken();
+      if (refreshToken != null) await client.post('/auth/logout', data: {'RefreshToken': refreshToken,});
+    } finally {
+      await token.clearSessionAsync();
+    }
   }
 
   //Deconnexion du user a tout ces appareilles 
   @override
   Future<void> logoutAllAsync() async {
-    final user = await token.getTokenInfoAsync();
-    if (user != null) await client.post('/auth/logout-all', data:  {'UserId': user.userId});
-    await token.clearSessionAsync();
+    try {
+      final user = await token.getTokenInfoAsync();
+      if (user != null) await client.post('/auth/logout-all', data:  {'UserId': user.userId});
+    } finally {
+      await token.clearSessionAsync();
+    }
   }
 
   //Actualisation de la session
   @override
   Future<void> refreshSessionAsync() async {
-    final refreshToken = await token.getRefreshToken();
-    if (refreshToken == null) throw Exception('No refresh token');
-    final response = await client.post('/auth/refresh-session', data:  {'RefreshToken': refreshToken});
-    final session = SessionResponse.fromJson(response.data);
-    await token.saveTokensAsync(session);
+    try {
+      final refreshToken = await token.getRefreshToken();
+      if (refreshToken == null) throw Exception('No refresh token');
+      final response = await client.post('/auth/refresh-session', data:  {'RefreshToken': refreshToken});
+      final session = SessionResponse.fromJson(response.data);
+      await token.saveTokensAsync(session);
+    } finally {
+      await token.clearSessionAsync();
+    }
   }
 
   //Envoi du code confirmation a email du user
@@ -59,7 +69,7 @@ class AuthRepository implements IAuthRepository{
   //Confirmation du compte
   @override
   Future<void> confirmAccountAsync(ConfirmAccountRequest request) async {
-    await client.post('/auth/confirm-account', data: request.toJson());
+    await client.post('/auth/confirm-email', data: request.toJson());
   }
 
   //Modification du password
@@ -71,7 +81,7 @@ class AuthRepository implements IAuthRepository{
   //Modification du password
   @override
   Future<void> changePasswordAsync(ChangePasswordRequest request) async {
-    final response = await client.post('/auth/change-password', data: request.toJson());
+    final response = await client.post('/auth/password', data: request.toJson());
     final session = SessionResponse.fromJson(response.data);
     await token.saveTokensAsync(session);
   }

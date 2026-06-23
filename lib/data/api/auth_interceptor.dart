@@ -26,18 +26,20 @@ class AuthInterceptor extends Interceptor {
 
   @override
   Future<void> onError( DioException error, ErrorInterceptorHandler handler) async {
-
     if (error.response?.statusCode != 401) return handler.next(error);
     final request = error.requestOptions;
+    final data = error.response?.data;
 
     //Anti boucle
     if (request.extra['retried'] == true) return handler.next(error);
     request.extra['retried'] = true;
 
     final refreshToken = await storage.getRefreshToken();
-    if (refreshToken == null){
+    final message = data is Map<String, dynamic> ? data['message'] : data?.toString();
+
+    if (refreshToken == null || message == "999"){
       //await storage.clearSessionAsync();
-      await _logout();
+      await onLogout();
       return handler.next(error);
     }
 
@@ -50,14 +52,14 @@ class AuthInterceptor extends Interceptor {
       //final success = await _refreshToken(refreshToken);
       if (!success) {
         //await storage.clearSessionAsync();
-        await _logout();
+        await onLogout();
         return handler.next(error);
       }
 
       final newToken = await storage.getAccessToken();
       if (newToken == null) {
         //await storage.clearSessionAsync();
-        await _logout();
+        await onLogout();
         return handler.next(error);
       }
       request.headers['Authorization'] = 'Bearer $newToken';
@@ -67,7 +69,7 @@ class AuthInterceptor extends Interceptor {
 
     } catch (_) {
       //await storage.clearSessionAsync();
-      await _logout();
+      await onLogout();
       handler.next(error);
 
     } finally {
@@ -77,20 +79,20 @@ class AuthInterceptor extends Interceptor {
     }
   }
 
-  Future<void> _logout() async {
+  /*Future<void> _logout() async {
     await storage.clearSessionAsync();
     await onLogout();
-  }
+  }*/
 
   Future<bool> _refreshToken(String refreshToken) async {
     try {
-
       final response = await refreshDio.post('/auth/refresh-session', data: {'RefreshToken': refreshToken});
       final session = SessionResponse.fromJson(response.data);
       await storage.saveTokensAsync(session);
       return true;
 
     } catch (_) {
+      await storage.clearSessionAsync();
       return false;
     }
   }

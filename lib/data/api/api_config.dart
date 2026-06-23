@@ -1,7 +1,7 @@
 class ApiConfig {
   ApiConfig._();
 
-  static const String baseUrl = 'http://localhost:8080/api';
+  static const String baseUrl = 'http://localhost:5000/api';
 
   static const Duration connectTimeout = Duration(seconds: 10);
 
@@ -11,8 +11,4 @@ class ApiConfig {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   };
-
-
-
-
 }

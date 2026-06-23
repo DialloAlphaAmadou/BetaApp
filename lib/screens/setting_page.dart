@@ -1,18 +1,21 @@
 import 'package:first_app/configs/locale_config.dart';
 import 'package:first_app/configs/theme_config.dart';
+import 'package:first_app/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SettingPage extends StatefulWidget{
+class SettingPage extends ConsumerStatefulWidget{
   const SettingPage({super.key});
 
   @override
-  State<SettingPage> createState() => _SettingPageState();
+  ConsumerState<SettingPage> createState() => _SettingPageState();
 }
 
-class _SettingPageState extends State<SettingPage>{
+class _SettingPageState extends ConsumerState<SettingPage>{
 
   @override
   Widget build(BuildContext context){
+
     return ListView(
       //mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -33,7 +36,12 @@ class _SettingPageState extends State<SettingPage>{
           ),
         ),
         
-        // Switch pour le thème
+        SwitchListTile(
+            title: const Text('Mode sombre'),
+            value: ref.watch(themeProvider) == ThemeMode.dark,
+            onChanged: (value) {ref.read(themeProvider.notifier).toggleTheme();} 
+        ),
+        /*// Switch pour le thème
         ValueListenableBuilder<ThemeMode>(
           valueListenable: ThemeConfig.themeNotifier,
           builder: (context, currentTheme, _) {
@@ -46,7 +54,7 @@ class _SettingPageState extends State<SettingPage>{
               },*/
             );
           },
-        ),
+        ),*/
 
           // Dropdown pour la langue
           ValueListenableBuilder<Locale>(

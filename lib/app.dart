@@ -1,18 +1,47 @@
-import 'package:first_app/configs/locale_config.dart';
-import 'package:first_app/configs/theme_config.dart';
+import 'package:first_app/navigations/app_router.dart';
 import 'package:first_app/navigations/nav_responsive.dart';
 import 'package:first_app/providers/auth_provider.dart';
+import 'package:first_app/providers/locale_provider.dart';
+import 'package:first_app/providers/theme_provider.dart';
 import 'package:first_app/screens/auths/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
   
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(routerProvider);
+    final themeMode = ref.watch(themeProvider);
+    //final locale = ref.watch(localeProvider);
 
-    return ListenableBuilder(
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+
+      // THEME
+      theme: ThemeConfig.lightTheme,
+      darkTheme: ThemeConfig.darkTheme,
+      themeMode: themeMode,
+
+      /*// LANGUE
+      locale: locale,
+      supportedLocales: const [
+        Locale('en'),
+        Locale('fr'),
+      ],*/
+
+      // ROUTER
+      routerConfig: router,
+
+    );
+
+  }
+}
+
+
+/*
+return ListenableBuilder(
 
       //Ecouteur globale
       listenable: Listenable.merge([
@@ -43,10 +72,8 @@ class MyApp extends StatelessWidget {
         );
       }
     ); 
-
-  }
-}
-
+    */
+/*
 class SplashScreen extends ConsumerWidget {
   const SplashScreen({super.key});
 
@@ -70,7 +97,7 @@ class SplashScreen extends ConsumerWidget {
     }
     
   }
-}
+}*/
 
 
 /*

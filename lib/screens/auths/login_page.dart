@@ -1,14 +1,18 @@
-import 'package:dio/dio.dart';
 import 'package:first_app/configs/Exception_config.dart';
 import 'package:first_app/controllers/Auth_controller.dart';
+import 'package:first_app/navigations/app_router.dart';
+import 'package:first_app/navigations/nav_controller.dart';
 import 'package:first_app/providers/auth_provider.dart';
-import 'package:first_app/providers/provider.dart';
+import 'package:first_app/providers/theme_provider.dart';
+import 'package:first_app/screens/auths/config.dart';
 import 'package:first_app/screens/auths/register_page.dart';
-import 'package:first_app/screens/auths/reset_password.dart';
-import 'package:first_app/widgets/Button_widget.dart';
+import 'package:first_app/screens/auths/send_confirmation.dart';
+import 'package:first_app/widgets/button_widget.dart';
 import 'package:first_app/widgets/form_widget.dart';
+import 'package:first_app/widgets/tools_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -40,25 +44,46 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     });
 
     try{
-
       final notifier = ref.read(authProvider.notifier);
       await notifier.login(controllers.toLoginRequest(rememberMe));
 
     }catch (e) {
-      
       if (!mounted) return;
-      setState(() {errorMessage = ExceptionConfig.extractMessage(e);});
+      final message = ExceptionConfig.extractMessage(e);
+      if(message == "901") {
+        var label = "Veuillez confirmer votre email";
+        setState(() {errorMessage = label;});
+        final result = await ToolsWidget.showConfirmDialog(context, label,);
+
+        if (!mounted) return;
+        errorMessage = null;
+        controllers.clear();
+        if (result == true) context.push(AppRoutes.send, extra: SendType.confirmAccount);
+        
+        //await NavHelper.navPage(context, SendPage(type: SendType.confirmAccount));
+      }else{
+        setState(() {errorMessage = ExceptionConfig.extractMessage(e);});
+      }
 
     }finally{
-      if (mounted) {
-        setState(() => isLoading = false);
-      }
+      if (mounted) setState(() => isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        //automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: Icon( ref.watch(themeProvider) == ThemeMode.dark ? Icons.light_mode : Icons.dark_mode, ),
+            onPressed: () {ref.read(themeProvider.notifier).toggleTheme();} 
+          ),
+          const SizedBox(width: 8,),
+        ],
+        
+      ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
@@ -100,9 +125,38 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   const SizedBox(height: 10),
 
                   //Navigation Pages
-                  ButtonWidget.navigationButton( context: context, text: "Créer un compte", page: const RegisterPage(), icon: Icons.person_add ),
-                  ButtonWidget.navigationButton( context: context, text: "Mot de passe oublié ?", page: const ResetPasswordPage(), icon: Icons.lock_reset ),
+                  TextButton(
+                    onPressed: (){
+                      controllers.clear();
+                      context.push(AppRoutes.register);
+                      //NavHelper.navPage(context, const RegisterPage());
+                    }, 
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.person_add),
+                        const SizedBox(width: 6),
+                        Text("Créer un compte"),
+                      ],
+                    ),
+                  ),
 
+                  TextButton(
+                    onPressed: () {
+                      controllers.clear();
+                      context.push(AppRoutes.send, extra: SendType.resetPassword);
+                      //NavHelper.navPage(context, const SendPage(type: SendType.resetPassword));
+                    }, 
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.lock_reset),
+                        const SizedBox(width: 6,),
+                        Text("Mot de passe oublié ?")
+                      ],
+                    )
+                  )
+                  
                 ],
               ),
             ),

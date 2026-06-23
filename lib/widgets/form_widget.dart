@@ -54,13 +54,9 @@ class FormWidget {
   }
 
   // USERNAME FIELD
-  static Widget textField({
-    required TextEditingController controller,
-    required String label,
-    bool requiredField = true,
-    String? errorText,
-    void Function(String)? onChanged,
-    IconData? icon,
+  static Widget textField({required TextEditingController controller, required String label,
+    bool requiredField = true, String? errorText,
+    void Function(String)? onChanged, IconData? icon,
   }) {
     return TextFormField(
       controller: controller,
@@ -88,13 +84,9 @@ class FormWidget {
   }
 
   // EMAIL FIELD
-  static Widget emailField({
-    required TextEditingController controller,
-    required String label,
-    bool requiredField = true,
-    String? errorText,
-    void Function(String)? onChanged,
-    IconData? icon,
+  static Widget emailField({required TextEditingController controller, required String label,
+    bool requiredField = true, String? errorText,
+    void Function(String)? onChanged, IconData? icon,
   }) {
     return TextFormField(
       controller: controller,
@@ -125,13 +117,9 @@ class FormWidget {
   }
 
   //PASSWORD FIELD
-  static Widget passwordField({
-    required TextEditingController controller,
-    required String label,
-    bool requiredField = true,
-    String? errorText,
-    void Function(String)? onChanged,
-    IconData? icon,
+  static Widget passwordField({ required TextEditingController controller, required String label,
+    bool requiredField = true, String? errorText,
+    void Function(String)? onChanged, IconData? icon, String? confirmPsw
   }) {
     
     final obscureNotifier = ValueNotifier<bool>(true);
@@ -156,16 +144,11 @@ class FormWidget {
           validator: (value) {
             final v = value?.trim() ?? '';
             //pas obligatoire → on accepte vide
-            if (!requiredField && v.isEmpty) {
-              return null;
-            }
+            if (!requiredField && v.isEmpty) return null;
             //obligatoire
-            if (requiredField && v.isEmpty) {
-              return "Ce champ est obligatoire";
-            }
-            if (v.length < 6) {
-              return "Minimum 6 caractères";
-            }
+            if (requiredField && v.isEmpty) return "Ce champ est obligatoire";
+            if (v.length < 6 && confirmPsw == null) return "Minimum 6 caractères";
+            if(v != confirmPsw && confirmPsw != null)  return 'Les mots de passe ne correspondent pas';
             return null;
           },
         );
@@ -174,13 +157,9 @@ class FormWidget {
   }
 
   //NUMBER FIELD
-  static Widget numberField({
-    required TextEditingController controller,
-    required String label,
-    bool requiredField = true,
-    String? errorText,
-    void Function(String)? onChanged,
-    IconData? icon,
+  static Widget numberField({required TextEditingController controller, required String label,
+    bool requiredField = true, String? errorText,
+    void Function(String)? onChanged, IconData? icon,
   }) {
     return TextFormField(
       controller: controller,
@@ -208,13 +187,9 @@ class FormWidget {
   }
 
   //NUMBER FIELD
-  static Widget phoneField({
-    required TextEditingController controller,
-    required String label,
-    bool requiredField = true,
-    String? errorText,
-    void Function(String)? onChanged,
-    IconData? icon,
+  static Widget phoneField({required TextEditingController controller, required String label,
+    bool requiredField = true, String? errorText,
+    void Function(String)? onChanged, IconData? icon,
   }) {
     return TextFormField(
       controller: controller,
@@ -229,17 +204,14 @@ class FormWidget {
       validator: (value) {
         final v = value?.trim() ?? '';
         //pas obligatoire → on accepte vide
-        if (!requiredField && v.isEmpty) {
-          return null;
-        }
+        if (!requiredField && v.isEmpty) return null;
+        
         //obligatoire
-        if (requiredField && v.isEmpty) {
-          return "Ce champ est obligatoire";
-        }
+        if (requiredField && v.isEmpty) return "Ce champ est obligatoire";
+        
         final regex = RegExp(r'^[0-9+\s()-]{7,15}$');
-        if (!regex.hasMatch(v)) {
-          return "Numéro de téléphone invalide";
-        }
+        if (!regex.hasMatch(v)) return "Numéro de téléphone invalide";
+        
         return null;
       },
     );
@@ -248,19 +220,71 @@ class FormWidget {
 
 
   //Checkbox
-  static Widget checkboxTile({
-    required bool value,
-    required ValueChanged<bool?> onChanged,
-    required String title,
-  }) {
+  static Widget checkboxTile({ required bool value, required ValueChanged<bool?> onChanged, required String title, }) {
     return CheckboxListTile(
       contentPadding: EdgeInsets.zero,
       title: Text(title),
       value: value,
       onChanged: onChanged,
-      controlAffinity: ListTileControlAffinity.leading,
+      //controlAffinity: ListTileControlAffinity.leading,
     );
   }
+
+  static Widget checkboxTileR({ required bool value, required ValueChanged<bool?> onChanged, required String title, }) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(title),
+        Checkbox( value: value, onChanged: onChanged, ),
+      ],
+    );
+  }
+
+  static Widget checkboxTileL({ required bool value, required ValueChanged<bool?> onChanged, required String title, }) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Checkbox( value: value, onChanged: onChanged, ),
+        Text(title),
+      ],
+    );
+  }
+
+  static Widget switchTile({ required String title, required bool value, required ValueChanged<bool> onChanged}){
+    return SwitchListTile(
+      contentPadding: EdgeInsets.zero,
+      title: Text(title),
+      value: value, 
+      onChanged: onChanged,
+    );
+  }
+
+  static Widget switchTileL({ required String title, required bool value, required ValueChanged<bool> onChanged}){
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(title),
+        const SizedBox(width: 5),
+        Transform.scale( scale: 0.7, // 80% de la taille normale
+          child: Switch( value: value, onChanged: onChanged, ),
+        ),
+      ],
+    );
+  }
+
+  static Widget switchTileR({ required String title, required bool value, required ValueChanged<bool> onChanged}){
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Transform.scale( scale: 0.7, // 80% de la taille normale
+          child: Switch( value: value, onChanged: onChanged, ),
+        ),
+        const SizedBox(width: 5),
+        Text(title),
+      ],
+    );
+  }
+
 
 
 

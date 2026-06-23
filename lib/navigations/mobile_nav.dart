@@ -1,40 +1,53 @@
-import 'package:first_app/navigations/nav_controller.dart';
+import 'package:first_app/navigations/app_router.dart';
+import 'package:first_app/navigations/nav_responsive.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
 
 class MobileNavigation extends StatelessWidget{
 
-  final NavController controller;
-  final Function(int) onPageChanged;
+  final int index;
+  final Widget child;
+  final Function(int) onTap;
 
   const MobileNavigation({
     super.key,
-    required this.controller,
-    required this.onPageChanged,
+    required this.index,
+    required this.child,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final index = controller.currentIndex;
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        //backgroundColor: Theme.of(context).colorScheme.onInverseSurface,
         title: Text(
-          NavData.titles[index].toUpperCase(), 
+          NavMenu.titles[index].toUpperCase(), 
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
+        actions: [  
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: IconButton(
+              icon: const Icon(Icons.person),
+              onPressed: () => context.push(AppRoutes.profile),
+            ),
+          )
+        ],
       ),
-      body: NavData.pages[index],
+      //body: NavMenu.pages[index],
+      body: child,
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Theme.of(context).colorScheme.onInverseSurface,
         currentIndex: index,
-        onTap: onPageChanged,
+        onTap: onTap,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(icon: Icon(Icons.build), label: 'Service'),
           BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'setting'),
-          BottomNavigationBarItem(icon: Icon(Icons.pages), label: 'Pages'),
         ],
       ),
     );
